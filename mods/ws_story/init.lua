@@ -96,6 +96,100 @@ triggers.register_on_craft({
             "\n--- The dew barrel is currently craftable without plastic sheeting ---", true)
     end,
 })
+-- Helper: pick a random message
+local function random_msg(list)
+    return list[math.random(1, #list)]
+end
+
+-- Bigfoot Encounter
+triggers.register_on_punch({
+    target = {"mobs:bigfoot"},
+    id = "ws_story:bigfoot",
+    call_once = true,
+    call = function(data)
+        local msgs = {
+            "I swear I just saw something huge and hairy in the trees.",
+            "Big footprints... and then it was gone. Maybe I'm not alone?",
+            "Bigfoot? Nah... right? RIGHT?"
+        }
+        entries.add_entry(data.playerName, "ws_story:survivor", random_msg(msgs), true)
+    end,
+})
+
+-- Yeti Encounter
+triggers.register_on_punch({
+    target = {"mobs:yeti"},
+    id = "ws_story:yeti",
+    call_once = true,
+    call = function(data)
+        local msgs = {
+            "A big white creature just ran across the snow. Looked back at me too.",
+            "It's freezing out here, and now there’s something big following me.",
+            "I think I just saw a Yeti. Or maybe frostbite is making me see things."
+        }
+        entries.add_entry(data.playerName, "ws_story:survivor", random_msg(msgs), true)
+    end,
+})
+
+-- Sand Worm Encounter (not dune-style scary)
+triggers.register_on_punch({
+    target = {"mobs:sand_worm"},
+    id = "ws_story:sand_worm",
+    call_once = true,
+    call = function(data)
+        local msgs = {
+            "Sand moved and a giant worm popped up. Looks harmless... maybe?",
+            "It just wriggled back into the dunes. Weird but kinda funny.",
+            "Biggest worm I’ve ever seen. Good thing it didn’t eat me."
+        }
+        entries.add_entry(data.playerName, "ws_story:survivor", random_msg(msgs), true)
+    end,
+})
+
+-- Spider Encounter
+triggers.register_on_punch({
+    target = {"mobs:spider", "mobs:spider_large"},
+    id = "ws_story:spider",
+    call_once = true,
+    call = function(data)
+        local msgs = {
+            "Spiders. Big ones. Creepy legs everywhere. I'm not a fan.",
+            "Eight legs too many for me. Staying away from webs from now on.",
+            "That web was fresh... means they are close. Yikes."
+        }
+        entries.add_entry(data.playerName, "ws_story:survivor", random_msg(msgs), true)
+    end,
+})
+
+-- Ogre Encounter
+triggers.register_on_punch({
+    target = {"mobs:ogre"},
+    id = "ws_story:ogre",
+    call_once = true,
+    call = function(data)
+        local msgs = {
+            "I just saw one of those big green brutes. Hope it didn’t see me.",
+            "Ogre ahead. Might need to sneak around.",
+            "Not sure what that was — looked like a walking rock with fists."
+        }
+        entries.add_entry(data.playerName, "ws_story:survivor", random_msg(msgs), true)
+    end,
+})
+
+-- Piranha Encounter
+triggers.register_on_punch({
+    target = {"mobs:piranha"},
+    id = "ws_story:piranha",
+    call_once = true,
+    call = function(data)
+        local msgs = {
+            "Something just bit me in the water — sharp teeth! Piranhas!",
+            "Splashing in the river was a mistake. Now I’m bleeding. Great.",
+            "Tiny fish with big teeth... that’s new."
+        }
+        entries.add_entry(data.playerName, "ws_story:survivor", random_msg(msgs), true)
+    end,
+})
 
 -- Dew barrel counter triggers
 triggers.register_counter("ws_story:dew_barrel_count", "craft", "dewcollector:barrel_closed", false)
