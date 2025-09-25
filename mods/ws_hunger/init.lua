@@ -1,0 +1,6 @@
+local modpath = minetest.get_modpath(minetest.get_current_modname())
+dofile(modpath .. "/settings.lua")
+dofile(modpath .. "/api.lua")
+dofile(modpath .. "/hud.lua")
+dofile(modpath .. "/logic.lua")
+dofile(modpath .. "/compat.lua")

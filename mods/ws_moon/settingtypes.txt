@@ -1,0 +1,6 @@
+# WS Moon settings
+ws_moon.cycle_days (Days per moon phase) int 4
+
+# Choose the default texture preset. Players can override with /ws_moon_style.
+# "classic": 16px square sprites; "realistic": higher-res photos
+ws_moon.style (Default moon texture style) enum classic classic,realistic
