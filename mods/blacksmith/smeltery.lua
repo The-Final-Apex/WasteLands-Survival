@@ -69,4 +69,3 @@ minetest.register_node("blacksmith:smeltery_bricks", {
     tiles = {"blacksmith_smeltery_bricks.png"},
     groups = {cracky = 3},
 })
-
