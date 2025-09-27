@@ -8,3 +8,4 @@ dofile(blacksmith.modpath .. "/smeltery.lua")
 dofile(blacksmith.modpath .. "/casting.lua")
 dofile(blacksmith.modpath .. "/tool_parts.lua")
 dofile(blacksmith.modpath .. "/tool_station.lua")
+

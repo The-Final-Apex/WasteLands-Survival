@@ -37,3 +37,4 @@ minetest.register_node("blacksmith:casting_table", {
         end
     end,
 })
+
