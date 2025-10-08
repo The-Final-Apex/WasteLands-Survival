@@ -1,0 +1,29 @@
+Recommended additional textures (16x16 or 32x32):
+
+    ws_achievements_first_steps.png (footprints icon)
+
+    ws_achievements_journal.png (book icon)
+
+    ws_achievements_crafting.png (hammer and wrench)
+
+    ws_achievements_water.png (water droplet)
+
+    ws_achievements_shelter.png (house icon)
+
+    ws_achievements_mining.png (pickaxe)
+
+    ws_achievements_combat.png (sword)
+
+    ws_achievements_exploration.png (compass)
+
+    ws_achievements_cooking.png (cooking pot)
+
+    ws_achievements_master.png (trophy)
+
+    ws_achievements_unknown.png (question mark)
+    
+    
+    
+    
+    I got the placholder background from google
+    Please replace it with a 16x16 banner or sth...
