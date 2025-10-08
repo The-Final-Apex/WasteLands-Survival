@@ -224,6 +224,8 @@ local creature_encounters = {
 
 -- Register all creature encounters
 for mob, data in pairs(creature_encounters) do
+    ---#FIXME
+    --[[
     triggers.register_on_punch({
         target = {mob},
         id = "ws_story:" .. mob,
@@ -233,6 +235,7 @@ for mob, data in pairs(creature_encounters) do
             entries.add_entry(punch_data.playerName, "ws_story:survivor", msg, true)
         end,
     })
+    --]]
 end
 
 -- Enhanced dew barrel system with progression
@@ -291,6 +294,8 @@ local resource_discoveries = {
 }
 
 for item, message in pairs(resource_discoveries) do
+    ---#FIXME
+    --[[
     triggers.register_on_craft({
         target = item,
         id = "ws_story:discover_" .. item,
@@ -299,6 +304,7 @@ for item, message in pairs(resource_discoveries) do
             entries.add_entry(data.playerName, "ws_story:survivor", message, true)
         end,
     })
+    --]]
 end
 
 -- New: Weather and time-based entries
@@ -336,6 +342,8 @@ local milestones = {
 }
 
 for item, message in pairs(milestones) do
+    ---#FIXME
+    --[[
     triggers.register_on_craft({
         target = item,
         id = "ws_story:milestone_" .. item,
@@ -345,6 +353,7 @@ for item, message in pairs(milestones) do
                 "Milestone reached: " .. message, true)
         end,
     })
+    --]]
 end
 
 -- Cleanup on player leave

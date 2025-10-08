@@ -301,7 +301,7 @@ minetest.after(0, radiation.check_players)
 
 -- Achievements integration
 if minetest.get_modpath("ws_achievements") then
-    achievements.register_achievement("radiation_survivor", {
+    ws_achievements.register_achievement("radiation_survivor", {
         title = "Radiation Survivor",
         description = "Survive your first high-radiation zone",
         category = "survival",
@@ -311,8 +311,8 @@ if minetest.get_modpath("ws_achievements") then
     -- Check for achievement
     minetest.register_globalstep(function(dtime)
         for player_name, data in pairs(radiation.players) do
-            if data.level >= 60 and not achievements.has_achievement(player_name, "radiation_survivor") then
-                achievements.grant_achievement(player_name, "radiation_survivor")
+            if data.level >= 60 and not ws_achievements.has_achievement(player_name, "radiation_survivor") then
+                ws_achievements.grant_achievement(player_name, "radiation_survivor")
             end
         end
     end)
