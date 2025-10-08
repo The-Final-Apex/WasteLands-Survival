@@ -561,14 +561,14 @@ minetest.register_chatcommand("build_ruin", {
 
 -- Achievement integration
 if minetest.get_modpath("ws_achievements") then
-    achievements.register_achievement("ruin_explorer", {
+    ws_achievements.register_achievement("ruin_explorer", {
         title = "Ruin Explorer",
         description = "Discover and explore 5 different ruins",
         category = "exploration",
         icon = "ws_achievements_ruins.png"
     })
     
-    achievements.register_achievement("treasure_hunter", {
+    ws_achievements.register_achievement("treasure_hunter", {
         title = "Treasure Hunter", 
         description = "Find loot in 10 different ruin chests",
         category = "exploration",

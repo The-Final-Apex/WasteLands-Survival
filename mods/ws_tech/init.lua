@@ -266,8 +266,8 @@ function tech.research_technology(player_name, tech_id)
     
     -- Achievement integration
     if minetest.get_modpath("ws_achievements") then
-        if not achievements.has_achievement(player_name, "first_research") then
-            achievements.grant_achievement(player_name, "first_research")
+        if not ws_achievements.has_achievement(player_name, "first_research") then
+            ws_achievements.grant_achievement(player_name, "first_research")
         end
     end
     
@@ -280,7 +280,8 @@ minetest.register_node("ws_tech:research_table", {
     tiles = {"ws_tech_research_table_top.png", "ws_tech_research_table_bottom.png", 
              "ws_tech_research_table_side.png"},
     groups = {cracky = 2, oddly_breakable_by_hand = 1},
-    sounds = default.node_sound_wood_defaults(),
+    ---#FIXME
+    sounds = ((rawget(_G, "default") and default.node_sound_wood_defaults()) or {}),
     
     on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
         local player_name = clicker:get_player_name()
@@ -391,16 +392,16 @@ minetest.register_on_joinplayer(function(player)
     tech.get_player_research(player_name) -- Initialize research data
 end)
 
--- Achievements integration
+-- ws_achievements integration
 if minetest.get_modpath("ws_achievements") then
-    achievements.register_achievement("first_research", {
+    ws_achievements.register_achievement("first_research", {
         title = "Mad Scientist",
         description = "Research your first technology",
         category = "crafting",
         icon = "ws_achievements_research.png"
     })
     
-    achievements.register_achievement("tech_master", {
+    ws_achievements.register_achievement("tech_master", {
         title = "Tech Master",
         description = "Research 10 different technologies",
         category = "crafting", 

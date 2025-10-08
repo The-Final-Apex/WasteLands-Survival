@@ -539,21 +539,21 @@ end)
 
 -- Achievement integration
 if minetest.get_modpath("ws_achievements") then
-    achievements.register_achievement("cartographer", {
+    ws_achievements.register_achievement("cartographer", {
         title = "Cartographer",
         description = "Discover 100 map chunks",
         category = "exploration",
         icon = "ws_achievements_map.png"
     })
     
-    achievements.register_achievement("landmark_explorer", {
+    ws_achievements.register_achievement("landmark_explorer", {
         title = "Landmark Explorer", 
         description = "Discover 10 different landmarks",
         category = "exploration",
         icon = "ws_achievements_landmark.png"
     })
     
-    achievements.register_achievement("pathfinder", {
+    ws_achievements.register_achievement("pathfinder", {
         title = "Pathfinder",
         description = "Set 5 personal waypoints",
         category = "exploration", 
