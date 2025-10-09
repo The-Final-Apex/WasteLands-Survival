@@ -114,14 +114,67 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     end
 end)
 
-minetest.register_on_punchnode(function(pos, node, puncher, pointed_thing)
-    local player_name = puncher:get_player_name()
-    if player_name and puncher:get_wielded_item():is_empty() then
+-- Register a special landmark marker item with visual feedback
+minetest.register_craftitem("ws_story:landmark_marker", {
+    description = "Landmark Marker\nRight-click to mark important locations",
+    inventory_image = "ws_story_marker.png",
+    groups = {landmark_tool = 1},
+    
+    on_use = function(itemstack, user, pointed_thing)
+        local player_name = user:get_player_name()
+        local pos
+        
+        if pointed_thing.type == "node" then
+            pos = pointed_thing.under
+        else
+            pos = user:get_pos()
+        end
+        
         location_memory[player_name] = pos
+        
+        -- Show formspec to name the location
         minetest.show_formspec(player_name, "ws_story:mark_location", 
             "field[location_name;Name this location;]")
-    end
-end)
+        
+        -- Visual feedback - particles at marked location
+        minetest.add_particlespawner({
+            amount = 20,
+            time = 2,
+            minpos = {x = pos.x - 0.5, y = pos.y, z = pos.z - 0.5},
+            maxpos = {x = pos.x + 0.5, y = pos.y + 2, z = pos.z + 0.5},
+            minvel = {x = -0.5, y = 1, z = -0.5},
+            maxvel = {x = 0.5, y = 2, z = 0.5},
+            minacc = {x = 0, y = -2, z = 0},
+            maxacc = {x = 0, y = -4, z = 0},
+            minexptime = 1,
+            maxexptime = 3,
+            minsize = 1,
+            maxsize = 2,
+            collisiondetection = false,
+            texture = "ws_story_marker_particle.png",
+        })
+        
+        -- Sound feedback
+        minetest.sound_play("ws_story_marker", {
+            pos = pos,
+            gain = 0.5,
+            max_hear_distance = 10,
+        })
+        
+        return itemstack
+    end,
+})
+
+-- Simple crafting recipe
+minetest.register_craft({
+    output = "ws_story:landmark_marker 4",
+    recipe = {
+        {"default:paper", "default:coal_lump", "default:paper"},
+        {"default:stick", "", "default:stick"},
+        {"", "default:stick", ""}
+    }
+})
+
 
 -- Enhanced wood breaking with location awareness
 triggers.register_on_dig({
@@ -222,24 +275,62 @@ local creature_encounters = {
     }
 }
 
--- Register all creature encounters
-for mob, data in pairs(creature_encounters) do
-    ---#FIXME
-    --[[
-    triggers.register_on_punch({
-        target = {mob},
-        id = "ws_story:" .. mob,
-        call_once = true,
-        call = function(punch_data)
-            local msg = random_msg(data.msgs)
-            entries.add_entry(punch_data.playerName, "ws_story:survivor", msg, true)
-        end,
-    })
-    --]]
-end
+-- Register creature encounters using Minetest's built-in events
+local creature_encounter_tracker = {}
+minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
+    if hitter and hitter:is_player() and damage > 0 then
+        local player_name = hitter:get_player_name()
+        local entity = player:get_luaentity()
+        
+        if entity and creature_encounters[entity.name] then
+            local encounter_key = player_name .. "_" .. entity.name
+            if not creature_encounter_tracker[encounter_key] then
+                creature_encounter_tracker[encounter_key] = true
+                local msg = random_msg(creature_encounters[entity.name].msgs)
+                entries.add_entry(player_name, "ws_story:survivor", msg, true)
+                
+                -- Reset tracker after a delay (5 minutes)
+                minetest.after(300, function()
+                    creature_encounter_tracker[encounter_key] = nil
+                end)
+            end
+        end
+    end
+end)
+
+-- Alternative: Register creature encounters when player gets close to mobs
+local mob_proximity_tracker = {}
+minetest.register_globalstep(function(dtime)
+    for _, player in ipairs(minetest.get_connected_players()) do
+        local player_name = player:get_player_name()
+        local player_pos = player:get_pos()
+        
+        for mob_name, data in pairs(creature_encounters) do
+            local encounter_key = player_name .. "_" .. mob_name
+            if not mob_proximity_tracker[encounter_key] then
+                -- Check if this mob type is nearby
+                local objects = minetest.get_objects_inside_radius(player_pos, 10)
+                for _, obj in ipairs(objects) do
+                    local entity = obj:get_luaentity()
+                    if entity and entity.name == mob_name then
+                        mob_proximity_tracker[encounter_key] = true
+                        local msg = random_msg(data.msgs)
+                        entries.add_entry(player_name, "ws_story:survivor", msg, true)
+                        
+                        -- Reset tracker after a delay
+                        minetest.after(300, function()
+                            mob_proximity_tracker[encounter_key] = nil
+                        end)
+                        break
+                    end
+                end
+            end
+        end
+    end
+end)
 
 -- Enhanced dew barrel system with progression
-triggers.register_counter("ws_story:dew_barrel_count", "craft", "dewcollector:barrel_closed", false)
+local dew_barrel_counters = {}
 
 local dew_messages = {
     [1] = "It is done, my first dew collection barrel! Now I just have to place it somewhere high and wait until it fills up. There's a good spot on that hill to the west.",
@@ -251,9 +342,11 @@ local dew_messages = {
 
 triggers.register_on_craft({
     target = "dewcollector:barrel_closed",
-    id = "ws_story:dew_barrel_progression",
+    id = "ws_story:dew_barrel",
     call = function(data)
-        local count = triggers.get_count("ws_story:dew_barrel_count", data.playerName)
+        dew_barrel_counters[data.playerName] = (dew_barrel_counters[data.playerName] or 0) + 1
+        local count = dew_barrel_counters[data.playerName]
+        
         if dew_messages[count] then
             entries.add_entry(data.playerName, "ws_story:survivor", dew_messages[count], true)
         elseif count > 5 then
@@ -294,17 +387,15 @@ local resource_discoveries = {
 }
 
 for item, message in pairs(resource_discoveries) do
-    ---#FIXME
-    --[[
+    local safe_id = "ws_story:discover_" .. item:gsub(":", "_")
     triggers.register_on_craft({
         target = item,
-        id = "ws_story:discover_" .. item,
+        id = safe_id,
         call_once = true,
         call = function(data)
             entries.add_entry(data.playerName, "ws_story:survivor", message, true)
         end,
     })
-    --]]
 end
 
 -- New: Weather and time-based entries
@@ -342,18 +433,16 @@ local milestones = {
 }
 
 for item, message in pairs(milestones) do
-    ---#FIXME
-    --[[
+    local safe_id = "ws_story:milestone_" .. item:gsub(":", "_")
     triggers.register_on_craft({
         target = item,
-        id = "ws_story:milestone_" .. item,
+        id = safe_id,
         call_once = true,
         call = function(data)
             entries.add_entry(data.playerName, "ws_story:survivor", 
                 "Milestone reached: " .. message, true)
         end,
     })
-    --]]
 end
 
 -- Cleanup on player leave
@@ -361,6 +450,19 @@ minetest.register_on_leaveplayer(function(player)
     local player_name = player:get_player_name()
     location_memory[player_name] = nil
     death_counters[player_name] = nil
+    dew_barrel_counters[player_name] = nil
+    
+    -- Clean up creature encounter trackers for this player
+    for key, _ in pairs(creature_encounter_tracker) do
+        if key:find(player_name, 1, true) == 1 then
+            creature_encounter_tracker[key] = nil
+        end
+    end
+    for key, _ in pairs(mob_proximity_tracker) do
+        if key:find(player_name, 1, true) == 1 then
+            mob_proximity_tracker[key] = nil
+        end
+    end
 end)
 
 minetest.log("action", "[ws_story] Enhanced survivor journal system loaded")
